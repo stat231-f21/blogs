@@ -1,0 +1,112 @@
+---
+title: "Data Science Stories"
+output:
+  rmdformats::downcute
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(fontawesome)
+library(emojifont)
+library(kableExtra)
+
+ 
+# google fonts
+#https://fonts.google.com/
+
+#customizing
+#https://rstudio4edu.github.io/rstudio4edu-book/doc-fancy.html
+```
+
+```{css, echo = FALSE}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
+body {
+    font-family: 'Poppins';
+}
+
+h1, h2, h3, h4, h5, h6, legend {
+  font-family: 'Poppins';
+  color: #39224f
+}
+
+#sidebar h2 {
+background-color: #39224f !important;
+  }
+
+#main a {
+color: #39224f !important;
+  background-image: linear-gradient(180deg,#438a8f,#438a8f);
+}
+
+#main .navbar-nav > .active > a { 
+background-color: #39224f !important;
+  color: white !important;
+}
+
+#main li.active a, li a:hover {
+background-color: #39224f !important;
+}
+
+code {
+  color: #39224f;
+}
+
+/*----------------- links ---------------------*/
+a { 
+  color: #8d80ad !important;
+}
+
+a:hover {
+ background-color: #39224f !important;
+}
+
+/*----------LOGO above TOC---------*/
+#toc {
+  background-image: url("img/Mammoth-masked-stomping-transparent.gif") !important;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
+}
+```
+
+
+
+```{r, eval = FALSE}
+blogdata <- readxl::read_xlsx("blog-data.xlsx") %>% 
+  mutate(images = paste0("![](img/",img,")"),
+         title_formatted = paste0('<h2 style="font-size:20px;"> [', 
+                                        title,
+                                        '](https://stat231-f21.github.io/blog_', 
+                                        repo,
+                                        ")</h2>"),
+         abstract = paste0('<p style="color:black;font-size:14px;">', abstract, '</p>')) %>%
+  mutate(text = paste(title_formatted, abstract, sep = "<br>")) %>%
+  select(images, text)
+
+colorpal <- c("774bb0","#ede6fb")
+```
+
+
+![](img/logo231_moodle.png)
+
+
+# Welcome! 
+
+
+
+# Blog Posts 
+
+Coming soon!
+
+
+
+# Resources 
+
+<ul>
+  <li> Font is Poppins from [Google fonts](https://fonts.google.com/) </li>
+</ul>
+
