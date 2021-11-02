@@ -75,19 +75,18 @@ a:hover {
 
 
 
-```{r, eval = FALSE}
+```{r}
 blogdata <- readxl::read_xlsx("blog-data.xlsx") %>% 
-  mutate(images = paste0("![](img/",img,")"),
-         title_formatted = paste0('<h2 style="font-size:20px;"> [', 
-                                        title,
-                                        '](https://stat231-f21.github.io/blog_', 
-                                        repo,
-                                        ")</h2>"),
-         abstract = paste0('<p style="color:black;font-size:14px;">', abstract, '</p>')) %>%
-  mutate(text = paste(title_formatted, abstract, sep = "<br>")) %>%
-  select(images, text)
-
-colorpal <- c("774bb0","#ede6fb")
+  mutate(team = str_replace_all(repo, "(-)", " ") %>% str_to_title(),
+         team = fct_recode(team,
+                           "THeHe" = "Thehe",
+                           "giRlbosses" = "Girlbosses"),
+         link = ifelse(str_detect(repo, "(group-)"),
+                       "https://stat231-s21.github.io/blogs",
+                       paste0("https://stat231-s21.github.io/blog_", repo)),
+         title_link = paste0("## ", team, ": [*", title, "*](", link, ")"),
+         image = paste0("![](", img, ")")) %>% 
+  arrange(team)
 ```
 
 
@@ -102,8 +101,29 @@ colorpal <- c("774bb0","#ede6fb")
 
 Coming soon!
 
+```{r, results = "asis"}
+for(i in 1:nrow(blogdata)){
+  cat(blogdata$title_link[i],
+      blogdata$image[i],
+      blogdata$abstract[i],
+      "\n\n",
+      sep = "\n\n")
+}
+```
 
-
+<!--
+## Food and PUG Administration `r set.seed(15); emo::ji("medicine")`
+-->
+```{r, eval = FALSE}
+table_test %>%
+  filter(str_detect(text, "Food-and-PUG-Administration")) %>%
+  kable(col.names=NULL, escape=FALSE) %>%
+  column_spec(1:2, width = c("50em","50em")
+              , border_left = FALSE
+              , border_right = FALSE
+              , background = colorpal[1]) %>%
+ column_spec(1, link = paste0('https://stat231-s21.github.io/Blog-', blog_link_names[1]))
+```
 # Resources 
 
 <ul>
