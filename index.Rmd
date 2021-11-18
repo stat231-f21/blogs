@@ -1,5 +1,8 @@
 ---
-title: "Data Science Stories"
+title: "Data Delights"
+subtitle: "*A data-driven blog from Amherst College*"
+author: "Data Science students and Prof. Brittney E. Bailey"
+date: "Fall 2021"
 output:
   rmdformats::downcute
 ---
@@ -11,7 +14,7 @@ library(tidyverse)
 library(fontawesome)
 library(emojifont)
 library(kableExtra)
-
+library(rvest)
  
 # google fonts
 #https://fonts.google.com/
@@ -20,30 +23,59 @@ library(kableExtra)
 #https://rstudio4edu.github.io/rstudio4edu-book/doc-fancy.html
 ```
 
-```{css, echo = FALSE}
+<!--
+https://developers.google.com/fonts/docs/css2
+-->
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+```{css font}
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap');
 
+body {
+    font-family: 'Josefin Sans';
+}
+
+h1, h2, h3, h4, h5, h6, legend {
+  font-family: 'Josefin Sans';
+  color: #3f1f69
+}
+
+code {
+  color: #3f1f69;
+}
+
+/*----------------- links ---------------------*/
+a { 
+  color: #3f1f69 !important;
+}
+
+a:hover {
+ background-color: #3f1f69 !important;
+}
+
+```
+
+
+```{css, eval = FALSE}
 body {
     font-family: 'Poppins';
 }
 
 h1, h2, h3, h4, h5, h6, legend {
   font-family: 'Poppins';
-  color: #39224f
+  color: #3f1f69
 }
 
 #sidebar h2 {
-background-color: #39224f !important;
+background-color: #3f1f69 !important;
   }
 
 #main a {
-color: #39224f !important;
+color: #3f1f69 !important;
   background-image: linear-gradient(180deg,#438a8f,#438a8f);
 }
 
 #main .navbar-nav > .active > a { 
-background-color: #39224f !important;
+background-color: #3f1f69 !important;
   color: white !important;
 }
 
@@ -52,30 +84,42 @@ background-color: #39224f !important;
 }
 
 code {
-  color: #39224f;
+  color: #3f1f69;
 }
 
 /*----------------- links ---------------------*/
 a { 
-  color: #8d80ad !important;
+  color: #3f1f69 !important;
 }
 
 a:hover {
- background-color: #39224f !important;
+ background-color: #3f1f69 !important;
 }
 
 /*----------LOGO above TOC---------*/
 #toc {
-  background-image: url("img/Mammoth-masked-stomping-transparent.gif") !important;
+  background-image: url("https://media.giphy.com/media/BgfP8Z2NfCQmeJmO9Q/giphy.gif") !important;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: bottom;
 }
 ```
 
+<!--
+Amherst gifs:
 
+celebrating mammoth:
+https://media.giphy.com/media/BgfP8Z2NfCQmeJmO9Q/giphy.gif
 
-```{r}
+welcome mammoth:
+https://media.giphy.com/media/BgfP8Z2NfCQmeJmO9Q/giphy.gif
+
+shining A:
+https://media.giphy.com/media/40BFX6KW7GwIsqEheA/giphy.gif
+
+-->
+
+```{r, cache = TRUE}
 blogdata <- readxl::read_xlsx("blog-data.xlsx") %>% 
   mutate(team = str_replace_all(repo, "(-)", " ") %>% str_to_title(),
          team = fct_recode(team,
@@ -84,35 +128,31 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
                            "AAA" = "Aaa"),
          link = ifelse(str_detect(repo, "(group-)"),
                        "https://stat231-s21.github.io/blogs",
-                       paste0("https://stat231-s21.github.io/blog_", repo)),
+                       paste0("https://stat231-s21.github.io/blog_", str_to_lower(repo))),
+         index_path = paste0("../blog_", repo, "/index.html"),
+         abstract = map_chr(index_path, 
+                            ~ tryCatch(read_html(.x) %>% 
+                                         html_elements("div p") %>% 
+                                         purrr::pluck(3) %>% 
+                                         html_text(),
+                                       error = function(e) "No description yet...")),
+         title = map_chr(index_path, 
+                            ~ tryCatch(read_html(.x) %>% 
+                                         html_element("h1.title") %>% 
+                                         html_text(),
+                                       error = function(e) "No link yet...")),
          title_link = paste0("## ", team, ": [*", title, "*](", link, ")"),
+         rmd_path = paste0("../blog_", repo, "/index.Rmd"),
          image = paste0("![](", img, ")")) %>% 
   arrange(order)
 ```
 
-
 ![](img/logo231_moodle.png)
 
 
-# Welcome! 
-
-
-# Test wordcloud
-
-```{r}
-library(wordcloud2)
-wordcloud2(demoFreq, size = 0.7, shape = 'star')
-wordcloud2(demoFreq, figPath = "img/clouds/peaceAndLove.jpg", size = 1, color = "skyblue", backgroundColor = "black")
-wordcloud2(demoFreq, figPath = "img/clouds/t.png", size = 1, color = "skyblue", backgroundColor = "white")
-
-wordcloud2(demoFreq, figPath = "img/states/Alaska.jpg", size = 1, color = "skyblue", backgroundColor = "white")
-wordcloud2(demoFreq, figPath = "img/states/Alabama.jpg", size = 1, color = "skyblue", backgroundColor = "white")
-letterCloud(demoFreq, word = "STAT231", wordSize = 1)
-```
+As the semester comes to a close, we are delighted to share some data-driven discoveries from the Fall 2021 sections of Data Science at Amherst College!
 
 # Blog Posts 
-
-In progress....
 
 ```{r, results = "asis"}
 for(i in 1:nrow(blogdata)){
@@ -140,7 +180,6 @@ table_test %>%
 
 # Resources 
 
-<ul>
-  <li> Font is Poppins from [Google fonts](https://fonts.google.com/) </li>
-</ul>
+* Font is Josefin Sans from [Google fonts](https://fonts.google.com/)
+* GIFs are courtesy of [giphy.com](https://www.giphy.com)
 
