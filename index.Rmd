@@ -80,13 +80,14 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
   mutate(team = str_replace_all(repo, "(-)", " ") %>% str_to_title(),
          team = fct_recode(team,
                            "THeHe" = "Thehe",
-                           "giRlbosses" = "Girlbosses"),
+                           "giRlbosses" = "Girlbosses", 
+                           "AAA" = "Aaa"),
          link = ifelse(str_detect(repo, "(group-)"),
                        "https://stat231-s21.github.io/blogs",
                        paste0("https://stat231-s21.github.io/blog_", repo)),
          title_link = paste0("## ", team, ": [*", title, "*](", link, ")"),
          image = paste0("![](", img, ")")) %>% 
-  arrange(team)
+  arrange(order)
 ```
 
 
@@ -96,10 +97,22 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
 # Welcome! 
 
 
+# Test wordcloud
+
+```{r}
+library(wordcloud2)
+wordcloud2(demoFreq, size = 0.7, shape = 'star')
+wordcloud2(demoFreq, figPath = "img/clouds/peaceAndLove.jpg", size = 1, color = "skyblue", backgroundColor = "black")
+wordcloud2(demoFreq, figPath = "img/clouds/t.png", size = 1, color = "skyblue", backgroundColor = "white")
+
+wordcloud2(demoFreq, figPath = "img/states/Alaska.jpg", size = 1, color = "skyblue", backgroundColor = "white")
+wordcloud2(demoFreq, figPath = "img/states/Alabama.jpg", size = 1, color = "skyblue", backgroundColor = "white")
+letterCloud(demoFreq, word = "STAT231", wordSize = 1)
+```
 
 # Blog Posts 
 
-Coming soon!
+In progress....
 
 ```{r, results = "asis"}
 for(i in 1:nrow(blogdata)){
@@ -124,6 +137,7 @@ table_test %>%
               , background = colorpal[1]) %>%
  column_spec(1, link = paste0('https://stat231-s21.github.io/Blog-', blog_link_names[1]))
 ```
+
 # Resources 
 
 <ul>
