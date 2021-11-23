@@ -1,7 +1,7 @@
 ---
-title: "![](https://media.giphy.com/media/BgfP8Z2NfCQmeJmO9Q/giphy.gif){width=15%} Data Delights"
-subtitle: "*A data-driven blog from Amherst College*"
-author: "Data Science students and Prof. Brittney E. Bailey"
+title: "Data Delights"
+subtitle: "*Dispatches from a Data Science course*"
+author: "[Prof. Brittney E. Bailey](https://bebailey.github.io) and her Data Science students"
 date: "Fall 2021"
 output:
   rmdformats::downcute
@@ -204,7 +204,29 @@ https://media.giphy.com/media/40BFX6KW7GwIsqEheA/giphy.gif
 -->
 
 
-```{r blogdata}
+:::::: {style="display: flex; font-size: large;"}
+
+::: {}
+![](https://media.giphy.com/media/BgfP8Z2NfCQmeJmO9Q/giphy.gif)
+
+:::
+
+::: {}
+
+<div class="horizontalgap" style="width:20px"></div>
+
+:::
+
+::: {}
+As the semester comes to a close, we are delighted to share some data-driven discoveries from the Fall 2021 sections of Data Science at Amherst College!
+
+Scroll down to explore the students' blog posts or use the navigation bar on the side to jump to a particular group!
+
+:::
+
+::::::
+
+```{r blogdata, cache = FALSE}
 loremipsum <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 blogdata <- readxl::read_xlsx("blog-data.xlsx") %>% 
@@ -236,13 +258,13 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
 write_csv(blogdata, "blogdata.csv")
 ```
 
-As the semester comes to a close, we are delighted to share some data-driven discoveries from the Fall 2021 sections of Data Science at Amherst College!
+
 
 # Blog Posts 
 
 ```{r, results = "asis"}
-if(blogdata$abstract[13] == ""){blogdata$abstract[13] <- loremipsum}
 for(i in 1:nrow(blogdata)){
+  if(blogdata$abstract[i] == ""){blogdata$abstract[i] <- loremipsum}
   cat(paste0(blogdata$title_link[i], "{width=40%}"),
       paste("|", blogdata$image[i], "|", blogdata$abstract[i], "|\n|:---|:-----|"),
       "\n\n",
@@ -250,10 +272,28 @@ for(i in 1:nrow(blogdata)){
 }
 ```
 
+
+```{r, eval = FALSE}
 <!--
 ## Food and PUG Administration `r set.seed(15); emo::ji("medicine")`
 -->
-```{r, eval = FALSE}
+# presentation order
+
+if(blogdata$abstract[13] == ""){blogdata$abstract[13] <- loremipsum}
+for(i in 1:nrow(blogdata)){
+  cat(paste0(blogdata$order[i], ". [", blogdata$team[i], "](", blogdata$link[i], ")"),
+      sep = "\n\n")
+}
+
+blogdata <- read_csv("blogdata.csv") %>% 
+  arrange(section, order) %>% 
+  select(team, title) %>% 
+  kable() %>% 
+  kable_styling()
+  
+  
+
+
 table_test %>%
   filter(str_detect(text, "Food-and-PUG-Administration")) %>%
   kable(col.names=NULL, escape=FALSE) %>%
