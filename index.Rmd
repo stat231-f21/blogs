@@ -239,20 +239,26 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
                        "https://stat231-f21.github.io/blogs",
                        paste0("https://stat231-f21.github.io/blog_", repo)),
          index_path = paste0("../blog_", repo, "/index.html"),
-         abstract = map_chr(index_path, 
+         abstract = map_chr(link, 
                             ~ tryCatch(read_html(.x) %>% 
                                          html_elements("div p") %>% 
                                          purrr::pluck(3) %>% 
                                          html_text(),
                                        error = function(e) paste(loremipsum))),
-         title = map_chr(index_path, 
-                            ~ tryCatch(read_html(.x) %>% 
+         title = map_chr(link, ~ read_html(.x) %>% 
                                          html_element("h1.title") %>% 
-                                         html_text(),
-                                       error = function(e) "No link yet...")),
+                                         html_text()),
+         title = ifelse(is.na(title), "No html file yet", title),
          title_link = paste0("## ", team, ": [*", title, "*](", link, ")"),
          rmd_path = paste0("../blog_", repo, "/index.Rmd"),
-         image = paste0("![](", img, ")")) %>% 
+         img_path = paste0("../blog_", repo, "/img"),
+         saved_image = map_chr(img_path, 
+                               ~ ifelse(length(list.files(.x, pattern = "(cover-image)")) == 0,
+                                        NA,  
+                                        list.files(.x, pattern = "(cover-image)"))),
+         image = case_when(!is.na(img) ~ paste0("![](", img, ")"),
+                           !is.na(saved_image) ~ paste0("![](", link, "/img/", saved_image, ")"),
+                           TRUE ~ paste0("![](", gif, ")"))) %>%
   arrange(order)
 
 write_csv(blogdata, "blogdata.csv")
@@ -290,18 +296,6 @@ blogdata <- read_csv("blogdata.csv") %>%
   select(team, title) %>% 
   kable() %>% 
   kable_styling()
-  
-  
-
-
-table_test %>%
-  filter(str_detect(text, "Food-and-PUG-Administration")) %>%
-  kable(col.names=NULL, escape=FALSE) %>%
-  column_spec(1:2, width = c("50em","50em")
-              , border_left = FALSE
-              , border_right = FALSE
-              , background = colorpal[1]) %>%
- column_spec(1, link = paste0('https://stat231-s21.github.io/Blog-', blog_link_names[1]))
 ```
 
 # Resources 
