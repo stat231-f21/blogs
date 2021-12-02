@@ -5,7 +5,7 @@ author: "[Prof. Brittney E. Bailey](https://bebailey.github.io) and her Data Sci
 date: "Fall 2021"
 output:
   rmdformats::downcute
-#self_contained: false
+self_contained: false
 ---
   
 ```{r setup, include=FALSE}
@@ -227,7 +227,7 @@ Scroll down to explore the students' blog posts or use the navigation bar on the
 
 ::::::
 
-```{r blogdata, cache = FALSE, eval = FALSE}
+```{r blogdata, cache = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 loremipsum <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 blogdata <- readxl::read_xlsx("blog-data.xlsx") %>% 
@@ -249,7 +249,9 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
          title = map_chr(link, ~ read_html(.x) %>% 
                                          html_element("h1.title") %>% 
                                          html_text()),
-         title = ifelse(is.na(title), "No html file yet", title),
+         title = case_when(is.na(title) ~ "No html file yet", 
+                           repo == "data-diggers" ~ "Kickstarter",
+                           TRUE ~ title),
          title_link = paste0("## ", team, ": [*", title, "*](", link, ")"),
          rmd_path = paste0("../blog_", repo, "/index.Rmd"),
          img_path = paste0("../blog_", repo, "/img"),
@@ -269,8 +271,8 @@ write_csv(blogdata, "blogdata.csv")
 
 # Blog Posts 
 
-```{r, results = "asis"}
-blogdata <- read_csv("blogdata.csv")
+```{r, results = "asis", warning = FALSE, message = FALSE}
+# blogdata <- read_csv("blogdata.csv")
 for(i in 1:nrow(blogdata)){
   if(blogdata$abstract[i] == ""){blogdata$abstract[i] <- loremipsum}
   cat(paste0(blogdata$title_link[i], "{width=40%}"),
@@ -300,17 +302,7 @@ blogdata <- read_csv("blogdata.csv") %>%
   kable_styling()
 ```
 
-# Shiny test
-
-<iframe height="500" width="100%" frameborder="no" src="https://bebailey.shinyapps.io/lab07a_shiny-baby-names/"> </iframe>
-
-```{r, out.extra = "height='500' width='100%' frameborder='no'", eval = TRUE}
-knitr::include_app("https://bebailey.shinyapps.io/lab07a_shiny-baby-names/")
-```
-
-
 # Resources 
 
 * Font is Josefin Sans from [Google fonts](https://fonts.google.com/)
 * GIFs are courtesy of [giphy.com](https://www.giphy.com)
-
