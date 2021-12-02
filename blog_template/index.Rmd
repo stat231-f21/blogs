@@ -6,6 +6,7 @@ output:
   rmdformats::readthedown:
     thumbnails: false
     highlight: "kate"
+self_contained: false # only needed for embedding Shiny app
 ---
 
 ```{r setup, include = FALSE}
@@ -99,6 +100,21 @@ Equations may be needed if you are explaining a new technique or perhaps providi
 
 For typesetting equations appropriately, take a look at the *Symbols in math mode* section of this  [cheat sheet](https://users.dickinson.edu/~richesod/latex/latexcheatsheet.pdf)  (or do some extra Googling---there are *many* resources).
 
+## Embedding Shiny apps
+To embed Shiny apps, you must publish your Shiny app to shinyapps.io (or the Amherst Shiny server). Make sure the YAML header includes the line `self_contained: false`. Then you can use this code chunk below, adjusting the width and height as needed to accommodate your Shiny app. 
+
+```{r my-shiny-app, out.width = "100%", out.extra = 'data-external="1" frameborder="no"'}
+knitr::include_app("https://bebailey.shinyapps.io/lab07a_shiny-baby-names/",
+                   height = "500px")
+```
+
+To deploy an app using the Amherst Shiny server instead of shinyapps.io, do the following:
+
+1. Go to r.amherst.edu and log in.
+2. Go to your *Home* directory on the server and create a new folder called *ShinyApps* if it doesn't already exist (make sure you match the case). 
+3. Set up your blog repo on the server using the directions from the first week of the semester (creating tokens to authenticate, then creating a new Version Control project, etc.).
+4. Once you've set up and pulled your blog repo on the server, copy the completed Shiny app folder to the *ShinyApps* folder in your *Home* directory. 
+5. Your app has now been deployed! Run it by going to *r.amherst.edu/apps/your-user-name/your-app-folder-name*.
 
 # You can even create tabs within your webpage if you want! {.tabset .tabset-fade .tabset-pills}
 
@@ -115,11 +131,23 @@ You can make a bulleted list like this:
 
 ## Numbered list
 
+
 You can make a numbered list like this
 
 1. First thing I want to say
 2. Second thing I want to say
 3. Third thing I want to say
+
+```{r figure2}
+ggplot(data = cars, aes(x = speed, y = dist)) + 
+  geom_point() + 
+  labs(x = "Speed of car (mph)",
+       y = "Distance taken to stop (ft)",
+       title = "Stopping distance increases with faster speeds",
+       subtitle = "Based on 1920s study") +
+  theme_classic()
+```
+
 
 # Customizing your blog design
 
