@@ -174,6 +174,8 @@ body {
 h1, h2, h3, h4, h5, h6, legend {
   font-family: 'Josefin Sans';
 }
+
+
 ```
 
 ```{css eval = FALSE}
@@ -188,6 +190,7 @@ h1, h2, h3, h4, h5, h6, legend {
   background-size: contain;
   background-position: bottom;
 }
+
 ```
 <!--
 Amherst gifs:
@@ -242,10 +245,14 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
          index_path = paste0("../blog_", repo, "/index.html"),
          abstract = map_chr(link, 
                             ~ tryCatch(read_html(.x) %>% 
-                                         html_elements("div p") %>% 
-                                         purrr::pluck(3) %>% 
+                                         html_elements("div p") %>%
+                                         purrr::pluck(str_which(., "^(<p><|<p )", negate = TRUE) %>%
+                                                        min()) %>% 
                                          html_text(),
                                        error = function(e) paste(loremipsum))),
+         abstract_short = ifelse(nchar(abstract) > 500, 
+                                 paste0(str_sub(abstract, 1, 500), "..."), 
+                                 abstract),
          title = map_chr(link, ~ read_html(.x) %>% 
                                          html_element("h1.title") %>% 
                                          html_text()),
@@ -259,12 +266,17 @@ blogdata <- readxl::read_xlsx("blog-data.xlsx") %>%
                                ~ ifelse(length(list.files(.x, pattern = "(cover-image)")) == 0,
                                         NA,  
                                         list.files(.x, pattern = "(cover-image)"))),
-         image = case_when(!is.na(img) ~ paste0("![](", img, ")"),
-                           !is.na(saved_image) ~ paste0("![](", link, "/img/", saved_image, ")"),
-                           TRUE ~ paste0("![](", gif, ")"))) %>%
+         image_link = case_when(!is.na(img) ~  img,
+                           !is.na(saved_image) ~ paste0(link, "/img/", saved_image),
+                           TRUE ~ gif),
+         image = paste0("![](", image_link, ")")
+         # image = case_when(!is.na(img) ~ paste0("![](", img, ")"),
+         #                   !is.na(saved_image) ~ paste0("![](", link, "/img/", saved_image, ")"),
+         #                   TRUE ~ paste0("![](", gif, ")"))
+         ) %>%
   arrange(order)
 
-write_csv(blogdata, "blogdata.csv")
+write_csv(blogdata, "blogdata.txt")
 ```
 
 
@@ -272,7 +284,25 @@ write_csv(blogdata, "blogdata.csv")
 # Blog Posts 
 
 ```{r, results = "asis", warning = FALSE, message = FALSE}
-# blogdata <- read_csv("blogdata.csv")
+#blogdata <- read_csv("blogdata.txt")
+for(i in 1:nrow(blogdata)){
+  if(blogdata$abstract[i] == ""){
+    blogdata$abstract[i] <- loremipsum
+    blogdata$abstract_short[i] <- loremipsum}
+  cat(blogdata$title_link[i],
+      paste0('<table class="tg"><thead><tr><td class="tg-0lax" style="width:40%;vertical-align:top;background-color:#ffffff;padding:10px"><img src="',
+             blogdata$image_link[i], 
+             '"></td><td class="tg-0lax" style="width:60%;background-color:#ffffff;padding:10px">',
+             blogdata$abstract_short[i],
+             '<br></td></tr></thead></table>'),
+      "\n\n",
+      sep = "\n\n")
+}
+```
+
+
+```{r scratch-work, eval = FALSE}
+# markdown table format version of blog posts
 for(i in 1:nrow(blogdata)){
   if(blogdata$abstract[i] == ""){blogdata$abstract[i] <- loremipsum}
   cat(paste0(blogdata$title_link[i], "{width=40%}"),
@@ -280,15 +310,8 @@ for(i in 1:nrow(blogdata)){
       "\n\n",
       sep = "\n\n")
 }
-```
 
-
-```{r, eval = FALSE}
-<!--
-## Food and PUG Administration `r set.seed(15); emo::ji("medicine")`
--->
 # presentation order
-
 if(blogdata$abstract[13] == ""){blogdata$abstract[13] <- loremipsum}
 for(i in 1:nrow(blogdata)){
   cat(paste0(blogdata$order[i], ". [", blogdata$team[i], "](", blogdata$link[i], ")"),
